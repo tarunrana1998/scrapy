@@ -58,15 +58,5 @@ class ExampleSpider(scrapy.Spider):
     def send_email(self, subject, body, to):
         """Send an email using Scrapy's MailSender."""
         mailer = MailSender.from_settings(self.settings)
-
-        # mailer = MailSender(
-        #     smtphost='smtp.hostinger.com',
-        #     mailfrom='"Tarun Rana" <support@tarunrana.in>',  # Use the desired format here
-        #     smtpuser='support@tarunrana.in',
-        #     smtppass='Black@#$1997',
-        #     smtpport=465,
-        #     smtptls=False,
-        #     smtpssl=True,
-        # )
         mailer.send(to=to, subject=subject, body=body)
         self.log("Email sent successfully!")
