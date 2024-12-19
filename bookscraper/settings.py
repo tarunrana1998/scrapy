@@ -1,5 +1,7 @@
 # Scrapy settings for bookscraper project
-#
+
+from decouple import config
+
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
 #
@@ -62,9 +64,10 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
+# ITEM_PIPELINES = {
 #    "bookscraper.pipelines.BookscraperPipeline": 300,
-#}
+#    'bookscraper.pipelines.SaveToMySQLPipeline': 400,
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -90,3 +93,20 @@ ROBOTSTXT_OBEY = True
 # Set settings whose default value is deprecated to a future-proof value
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
+
+# FEEDS = {
+#     'data/%(name)s/%(name)s_%(time)s.csv': {
+#         'format': 'csv',
+#         }
+# }
+
+
+
+MAIL_FROM = config('MAIL_FROM')
+MAIL_HOST = config('MAIL_HOST')
+MAIL_PORT = config('MAIL_PORT', cast=int)  # Cast to integer
+MAIL_USER = config('MAIL_USER')
+MAIL_PASS = config('MAIL_PASS')
+MAIL_TLS = config('MAIL_TLS', cast=bool)  # Cast to boolean
+MAIL_SSL = config('MAIL_SSL', cast=bool)  # Cast to boolean
+

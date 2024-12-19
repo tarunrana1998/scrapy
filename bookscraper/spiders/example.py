@@ -1,10 +1,72 @@
+from scrapy.mail import MailSender
 import scrapy
-
+import os
 
 class ExampleSpider(scrapy.Spider):
-    name = "example"
-    allowed_domains = ["example.com"]
-    start_urls = ["https://example.com"]
+    name = "example_spider"
+    start_urls = ['https://books.toscrape.com/']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.seen_file = "seen_books.txt"  # File to store previously seen book names
+        self.seen_books = set()  # In-memory set to track seen books
+        self.load_seen_books()
+
+    def load_seen_books(self):
+        """Load previously seen book names from the file."""
+        if os.path.exists(self.seen_file):
+            with open(self.seen_file, "r") as file:
+                self.seen_books = set(file.read().splitlines())
+
+    def save_seen_books(self):
+        """Save the updated list of seen book names to the file."""
+        with open(self.seen_file, "w") as file:
+            file.write("\n".join(self.seen_books))
 
     def parse(self, response):
-        pass
+        books = response.css('article.product_pod')
+        new_data_flag = False  # Track if new data is found
+
+        for book in books:
+            name = book.css('h3 a::text').get()
+            price = book.css('div.product_price .price_color::text').get()
+            url = response.urljoin(book.css('h3 a').attrib['href'])
+            print(name)
+            # If the book name is new, process it
+            if name not in self.seen_books:
+                self.seen_books.add(name)  # Add to the in-memory set
+                new_data_flag = True  # Mark that new data was found
+
+                # Log or yield the new data (optional)
+                yield {
+                    'name': name,
+                    'price': price,
+                    'url': url,
+                }
+
+        # Save the updated list of seen books to the file
+        self.save_seen_books()
+
+        # If new data was found, send an email
+        if new_data_flag:
+            self.send_email(
+                subject="New Books Found",
+                body="New book data has been scraped and processed.",
+                to=["tarunrana1997@gmail.com"]
+            )
+
+    def send_email(self, subject, body, to):
+        """Send an email using Scrapy's MailSender."""
+        mailer = MailSender.from_settings(self.settings)
+
+        # mailer = MailSender(
+        #     smtphost='smtp.hostinger.com',
+        #     mailfrom='"Tarun Rana" <support@tarunrana.in>',  # Use the desired format here
+        #     smtpuser='support@tarunrana.in',
+        #     smtppass='Black@#$1997',
+        #     smtpport=465,
+        #     smtptls=False,
+        #     smtpssl=True,
+        # )
+        mailer.send(to=to, subject=subject, body=body)
+        self.log("Email sent successfully!")
