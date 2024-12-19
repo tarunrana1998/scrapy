@@ -1,6 +1,8 @@
 # Scrapy settings for bookscraper project
 
 from decouple import config
+import logging
+from logging.handlers import RotatingFileHandler
 
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -110,3 +112,6 @@ MAIL_PASS = config('MAIL_PASS')
 MAIL_TLS = config('MAIL_TLS', cast=bool)  # Cast to boolean
 MAIL_SSL = config('MAIL_SSL', cast=bool)  # Cast to boolean
 
+
+LOG_FILE = 'logs/scrapy.log'  # Name of the log file
+LOG_LEVEL = 'DEBUG'       # Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
