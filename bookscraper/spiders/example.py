@@ -1,6 +1,7 @@
 from scrapy.mail import MailSender
 import scrapy
 import os
+from bookscraper.utils import send_email  # Import the send_email function
 
 class ExampleSpider(scrapy.Spider):
     name = "example_spider"
@@ -49,14 +50,9 @@ class ExampleSpider(scrapy.Spider):
 
         # If new data was found, send an email
         if new_data_flag:
-            self.send_email(
-                subject="New Books Found",
-                body="New book data has been scraped and processed.",
+            send_email(
+                self.settings,
+                subject="New Data Added",
+                body="New data inserted into the database.",
                 to=["tarunrana1997@gmail.com"]
             )
-
-    def send_email(self, subject, body, to):
-        """Send an email using Scrapy's MailSender."""
-        mailer = MailSender.from_settings(self.settings)
-        mailer.send(to=to, subject=subject, body=body)
-        self.log("Email sent successfully!")
